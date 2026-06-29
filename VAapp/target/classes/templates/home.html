@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts :: layout(~{::title}, ~{::section})">
+
+<head>
+    <title>VA Dashboard</title>
+</head>
+
+<body>
+
+<section>
+
+<h1>VA Benefits Eligibility & Tracking System</h1>
+
+<div class="card">
+    <h2>
+        Welcome,
+        <span th:text="${veteran != null ? veteran.firstName : 'User'}"></span>!
+    </h2>
+</div>
+
+<div class="card">
+    <h2>Eligibility Summary</h2>
+
+    <p>
+        <strong>Status:</strong><br>
+        <span th:text="${eligibilityStatus}"></span>
+    </p>
+
+    <p>
+        <strong>Reason:</strong><br>
+        <span th:text="${eligibilityReason}"></span>
+    </p>
+</div>
+
+<div class="card">
+    <h2>Quick Actions</h2>
+
+    <ul>
+        <li><a th:href="@{/my-profile}">My Profile</a></li>
+
+        <li th:if="${user.role.name() != 'ROLE_ADMIN'}">
+            <a th:href="@{/claims/my}">My Claims</a>
+        </li>
+
+        <li th:if="${user.role.name() == 'ROLE_ADMIN'}">
+            <a th:href="@{/admin}">Admin Dashboard</a>
+        </li>
+
+        <li><a th:href="@{/logout}">Logout</a></li>
+    </ul>
+</div>
+
+</section>
+
+</body>
+</html>

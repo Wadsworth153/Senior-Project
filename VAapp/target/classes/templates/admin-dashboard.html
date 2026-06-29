@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts :: layout(~{::title}, ~{::content})">
+
+<head>
+    <title th:text="${title}">Admin Dashboard</title>
+</head>
+
+<body>
+
+<div th:fragment="content">
+
+<h1>Admin Dashboard</h1>
+
+<hr>
+
+<h2>Veterans</h2>
+
+<div class="card">
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Role</th>
+    </tr>
+
+    <tr th:each="user : ${veterans}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.username}"></td>
+        <td th:text="${user.role}"></td>
+    </tr>
+</table>
+
+</div>
+
+<hr>
+
+<h2>All Claims</h2>
+
+<div class="card">
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Actions</th>
+    </tr>
+
+    <tr th:each="claim : ${claims}">
+        <td th:text="${claim.id}"></td>
+        <td th:text="${claim.claimType}"></td>
+        <td th:text="${claim.status}"></td>
+        <td th:text="${claim.submittedDate}"></td>
+
+        <td>
+            <a class="button"
+               th:href="@{'/claims/update?id=' + ${claim.id} + '&status=APPROVED'}">
+                Approve
+            </a>
+
+            <a class="button"
+               th:href="@{'/claims/update?id=' + ${claim.id} + '&status=DENIED'}">
+                Deny
+            </a>
+
+            <a class="button"
+               th:href="@{'/claims/update?id=' + ${claim.id} + '&status=UNDER_REVIEW'}">
+                Review
+            </a>
+        </td>
+    </tr>
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>

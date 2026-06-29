@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts :: layout(~{::title}, ~{::content})">
+
+<head>
+    <title th:text="${title}">My Profile</title>
+</head>
+
+<body>
+
+<div th:fragment="content">
+
+<h1>My Veteran Profile</h1>
+
+<div class="card" th:if="${veteran != null}">
+    <p>First Name: <span th:text="${veteran.firstName}"></span></p>
+    <p>Last Name: <span th:text="${veteran.lastName}"></span></p>
+    <p>Email: <span th:text="${veteran.email}"></span></p>
+    <p>Eligibility: <span th:text="${eligibilityStatus}"></span></p>
+</div>
+
+<div class="card" th:if="${veteran == null}">
+    <p>No veteran profile found for this account.</p>
+</div>
+
+</div>
+
+</body>
+</html>

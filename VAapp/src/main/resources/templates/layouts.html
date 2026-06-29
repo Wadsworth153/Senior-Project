@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(title, content)">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:replace="${title}">VA System</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:Arial, Helvetica, sans-serif;
+            background:#f4f6f9;
+        }
+
+        .navbar{
+            background:#0b2e4a;
+            color:white;
+            padding:18px 25px;
+            font-size:22px;
+            font-weight:bold;
+        }
+
+        .wrapper{
+            display:flex;
+            min-height:calc(100vh - 60px);
+        }
+
+        .sidebar{
+            width:240px;
+            background:#143a56;
+            padding:20px;
+        }
+
+        .sidebar a{
+            display:block;
+            color:white;
+            text-decoration:none;
+            padding:12px;
+            margin-bottom:8px;
+            border-radius:6px;
+        }
+
+        .sidebar a:hover{
+            background:#1d547a;
+        }
+
+        .content{
+            flex:1;
+            padding:30px;
+        }
+
+        .card{
+            background:white;
+            padding:20px;
+            border-radius:8px;
+            box-shadow:0 2px 8px rgba(0,0,0,.1);
+            margin-bottom:20px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            background:white;
+        }
+
+        th{
+            background:#e9eef5;
+        }
+
+        th,td{
+            padding:12px;
+            border-bottom:1px solid #ddd;
+            text-align:left;
+        }
+
+        .button{
+            display:inline-block;
+            padding:10px 16px;
+            background:#0b2e4a;
+            color:white;
+            text-decoration:none;
+            border-radius:5px;
+        }
+
+        .button:hover{
+            background:#164d73;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    VA Benefits Eligibility & Tracking System
+</div>
+
+<div class="wrapper">
+
+    <div class="sidebar">
+        <a th:href="@{/home}">Dashboard</a>
+        <a th:href="@{/my-profile}">My Profile</a>
+        <a th:href="@{/claims}">My Claims</a>
+        <a th:href="@{/claims/new}">Create Claim</a>
+
+        <a th:if="${user != null and user.role.name() == 'ROLE_ADMIN'}"
+           th:href="@{/admin}">
+            Admin Dashboard
+        </a>
+
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+
+    <div class="content">
+        <th:block th:replace="${content}" />
+    </div>
+
+</div>
+
+</body>
+</html>

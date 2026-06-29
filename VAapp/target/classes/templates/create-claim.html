@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts :: layout(~{::title}, ~{::section})">
+
+<head>
+    <title>Create Claim</title>
+</head>
+
+<body>
+
+<section>
+
+<h1>Submit New Claim</h1>
+
+<div class="card">
+
+<form th:action="@{/claims/new}" th:object="${claim}" method="post">
+
+    <label>Claim Type:</label><br>
+    <input type="text" th:field="*{claimType}" />
+    <br><br>
+
+    <label>Description:</label><br>
+    <textarea th:field="*{description}"></textarea>
+    <br><br>
+
+    <button class="button" type="submit">Submit Claim</button>
+
+</form>
+
+<br>
+
+<a class="button" th:href="@{/claims}">Back to Claims</a>
+
+</div>
+
+</section>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts :: layout(~{::title}, ~{::content})">
+
+<head>
+    <title>Claims</title>
+</head>
+
+<body>
+
+<div th:fragment="content">
+
+<h1>Claims</h1>
+
+<div class="card">
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Description</th>
+    </tr>
+
+    <tr th:each="claim : ${claims}">
+        <td th:text="${claim.id}"></td>
+        <td th:text="${claim.claimType}"></td>
+        <td th:text="${claim.status}"></td>
+        <td th:text="${claim.submittedDate}"></td>
+        <td th:text="${claim.description}"></td>
+    </tr>
+</table>
+
+</div>
+
+<br>
+
+<a class="button" th:href="@{/claims/new}">Create New Claim</a>
+
+</div>
+
+</body>
+</html>
