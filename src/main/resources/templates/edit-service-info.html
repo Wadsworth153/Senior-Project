@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts :: layout(~{::title}, ~{::content})">
+
+<head>
+    <title>Edit Service Information</title>
+</head>
+
+<body>
+<div th:fragment="content">
+
+    <h1>Edit Service Information</h1>
+	
+	<p th:if="${errorMessage != null}"
+	   th:text="${errorMessage}"
+	   role="alert">
+	</p>
+
+    <div class="card">
+
+        <form th:action="@{/my-profile/edit}"
+              th:object="${veteran}"
+              method="post">
+
+            <div>
+                <label for="branchOfService">Branch of Service:</label>
+                <input type="text"
+                       id="branchOfService"
+                       th:field="*{branchOfService}"
+                       required>
+            </div>
+
+            <div>
+                <label for="serviceStartDate">Service Start Date:</label>
+                <input type="date"
+                       id="serviceStartDate"
+                       th:field="*{serviceStartDate}"
+                       required>
+            </div>
+
+            <div>
+                <label for="serviceEndDate">Service End Date:</label>
+                <input type="date"
+                       id="serviceEndDate"
+                       th:field="*{serviceEndDate}"
+                       required>
+            </div>
+
+            <div>
+                <label for="dischargeStatus">Discharge Status:</label>
+                <select id="dischargeStatus"
+                        th:field="*{dischargeStatus}"
+                        required>
+                    <option value="">Select Discharge Status</option>
+                    <option value="Honorable">Honorable</option>
+                    <option value="General">General</option>
+                    <option value="Other Than Honorable">Other Than Honorable</option>
+                    <option value="Bad Conduct">Bad Conduct</option>
+                    <option value="Dishonorable">Dishonorable</option>
+                </select>
+            </div>
+
+            <br>
+
+            <button type="submit">Save Changes</button>
+
+            <a th:href="@{/my-profile}">Cancel</a>
+
+        </form>
+
+    </div>
+
+</div>
+</body>
+</html>
+

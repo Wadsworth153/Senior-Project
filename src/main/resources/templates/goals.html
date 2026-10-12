@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Goals | VA Benefits Eligibility & Tracking System</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f8;
+            color: #263238;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #5f6b73;
+            margin-top: 0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 11px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .primary {
+            background-color: #245b45;
+            color: white;
+        }
+
+        .secondary {
+            background-color: #e3e8ec;
+            color: #263238;
+        }
+
+        .danger {
+            background-color: #a52a2a;
+            color: white;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background-color: #dff3e5;
+            color: #205c35;
+        }
+
+        .goal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .goal-card {
+            background-color: white;
+            border: 1px solid #dce2e6;
+            border-radius: 8px;
+            padding: 22px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .goal-card h2 {
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        .description {
+            color: #5f6b73;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            background-color: #e7eee9;
+            color: #245b45;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status {
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .goal-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-top: 18px;
+        }
+
+        .goal-actions form {
+            margin: 0;
+        }
+
+        .empty-state {
+            background-color: white;
+            border: 1px solid #dce2e6;
+            border-radius: 8px;
+            padding: 35px;
+            text-align: center;
+        }
+
+        .empty-state p {
+            line-height: 1.6;
+            color: #5f6b73;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 15px auto;
+                padding: 15px;
+            }
+
+            .page-header {
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="page-header">
+        <div>
+            <h1>My Goals</h1>
+            <p class="subtitle">
+                Organize your benefit interests and track your personal progress.
+            </p>
+        </div>
+
+        <a th:href="@{/goals/new}" class="button primary">
+            + Add a Goal
+        </a>
+    </header>
+
+    <div th:if="${successMessage}"
+         class="message success"
+         th:text="${successMessage}">
+        Your action was completed successfully.
+    </div>
+
+    <div th:if="${#lists.isEmpty(goals)}" class="empty-state">
+        <h2>You haven't added any goals yet.</h2>
+
+        <p>
+            Choose from predefined benefit categories or create a custom
+            goal that reflects something you want to accomplish.
+        </p>
+
+        <a th:href="@{/goals/new}" class="button primary">
+            Create Your First Goal
+        </a>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(goals)}" class="goal-grid">
+
+        <article class="goal-card" th:each="goal : ${goals}">
+
+            <span th:text="${goal.goalType}"></span>
+
+            <h2 th:text="${goal.title}">Education &amp; Training</h2>
+
+            <p class="description"
+               th:if="${goal.description != null
+                   and !#strings.isEmpty(goal.description)}"
+               th:text="${goal.description}">
+                Explore available benefits and resources.
+            </p>
+
+            <p class="description"
+               th:unless="${goal.description != null
+                   and !#strings.isEmpty(goal.description)}">
+                No description has been added.
+            </p>
+
+            <p class="status">
+                Status:
+                <span th:text="${#strings.replace(goal.status.name(), '_', ' ')}">
+                    NOT STARTED
+                </span>
+            </p>
+
+            <div class="goal-actions">
+
+                <a th:href="@{/goals/{id}/edit(id=${goal.id})}"
+                   class="button secondary">
+                    Edit Goal
+                </a>
+
+                <form th:action="@{/goals/{id}/delete(id=${goal.id})}"
+                      method="post"
+                      onsubmit="return confirm('Are you sure you want to delete this goal?');">
+
+                    <button type="submit" class="button danger">
+                        Delete
+                    </button>
+                </form>
+
+            </div>
+
+        </article>
+
+    </div>
+
+    <p style="margin-top: 30px;">
+        <a th:href="@{/home}" class="button secondary">
+            Return to Dashboard
+        </a>
+    </p>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+﻿target/
+.classpath
+.project
+.settings/
+.factorypath
+.sts4-cache/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example

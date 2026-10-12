@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Goal | VA Benefits Eligibility & Tracking System</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f8;
+            color: #263238;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .form-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #dce2e6;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .subtitle {
+            color: #5f6b73;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select,
+        textarea {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #b9c3ca;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 15px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        .help-text {
+            color: #5f6b73;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-top: 7px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 11px 17px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .primary {
+            background-color: #245b45;
+            color: white;
+        }
+
+        .secondary {
+            background-color: #e3e8ec;
+            color: #263238;
+        }
+
+        .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .notice {
+            background-color: #edf3ef;
+            border-left: 4px solid #245b45;
+            padding: 13px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 15px auto;
+                padding: 15px;
+            }
+
+            .form-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="form-card">
+
+        <h1>Edit Goal</h1>
+
+        <p class="subtitle">
+            Update your goal details and record your progress.
+        </p>
+
+        <div class="notice">
+            Your changes are saved to your personal planning record.
+            Updating a goal does not change your official VA eligibility.
+        </div>
+
+        <form th:action="@{/goals/{id}/edit(id=${goal.id})}"
+              method="post">
+
+            <!-- Goal title -->
+            <div class="form-group">
+
+                <label for="title">Goal Title</label>
+
+                <input type="text"
+                       id="title"
+                       name="title"
+                       th:value="${goal.title}"
+                       maxlength="150"
+                       required>
+
+                <p class="help-text">
+                    Update the name of the goal you want to accomplish.
+                </p>
+
+            </div>
+
+            <!-- Goal description -->
+            <div class="form-group">
+
+                <label for="description">Description</label>
+
+                <textarea id="description"
+                          name="description"
+                          maxlength="1000"
+                          th:text="${goal.description}"
+                          placeholder="Describe what you want to accomplish..."></textarea>
+
+                <p class="help-text">
+                    Explain what you want to learn, organize, or accomplish.
+                </p>
+
+            </div>
+
+            <!-- Goal status -->
+            <div class="form-group">
+
+                <label for="status">Progress Status</label>
+
+                <select id="status"
+                        name="status"
+                        required>
+
+                    <option th:each="goalStatus : ${goalStatuses}"
+                            th:value="${goalStatus.name()}"
+                            th:text="${#strings.replace(goalStatus.name(), '_', ' ')}"
+                            th:selected="${goal.status == goalStatus}">
+                        Not Started
+                    </option>
+
+                </select>
+
+                <p class="help-text">
+                    Choose the status that best reflects your current progress.
+                </p>
+
+            </div>
+
+            <!-- Form actions -->
+            <div class="form-actions">
+
+                <button type="submit" class="button primary">
+                    Save Changes
+                </button>
+
+                <a th:href="@{/goals}" class="button secondary">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

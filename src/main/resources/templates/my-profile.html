@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts :: layout(~{::title}, ~{::content})">
+
+<head>
+    <title th:text="${title}">My Profile</title>
+</head>
+
+<body>
+<div th:fragment="content">
+
+    <h1>My Veteran Profile</h1>
+
+    <div class="card" th:if="${veteran != null}">
+
+        <h2>Personal Information</h2>
+
+        <p>First Name: <span th:text="${veteran.firstName}"></span></p>
+        <p>Last Name: <span th:text="${veteran.lastName}"></span></p>
+        <p>Email: <span th:text="${veteran.email}"></span></p>
+
+        <h2>Service Information</h2>
+
+        <p>Branch of Service:
+            <span th:text="${veteran.branchOfService}"></span>
+        </p>
+
+        <p>Service Start Date:
+            <span th:text="${veteran.serviceStartDate}"></span>
+        </p>
+
+        <p>Service End Date:
+            <span th:text="${veteran.serviceEndDate}"></span>
+        </p>
+
+        <p>Discharge Status:
+            <span th:text="${veteran.dischargeStatus}"></span>
+        </p>
+
+        <h2>Eligibility Assessment</h2>
+
+        <p>Eligibility:
+            <span th:text="${eligibilityStatus}"></span>
+        </p>
+
+        <p>Assessment Reason:
+            <span th:text="${eligibilityReason}"></span>
+        </p>
+
+        <a th:href="@{/my-profile/edit}" class="btn btn-primary">
+            Edit Service Information
+        </a>
+
+        <p>
+            <small>
+                This assessment uses the application's prototype rules and
+                does not represent an official VA eligibility determination.
+            </small>
+        </p>
+
+    </div>
+
+    <div class="card" th:if="${veteran == null}">
+        <p>No veteran profile found for this account.</p>
+    </div>
+
+</div>
+</body>
+</html>
+

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>VA Veterans</title>
+</head>
+<body>
+
+<h1>Veterans List</h1>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+		<th>Eligibility</th>
+		<th>Reason</th>
+    </tr>
+
+    <tr th:each="veteran : ${veterans}">
+        <td th:text="${veteran.id}"></td>
+        <td th:text="${veteran.firstName}"></td>
+        <td th:text="${veteran.lastName}"></td>
+        <td th:text="${veteran.email}"></td>
+		<td th:text="${veteran.eligibilityStatus}"></td>
+		<td th:text="${veteran.eligibilityReason}"></td>
+    </tr>
+
+</table>
+
+</body>
+</html>

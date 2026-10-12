@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts :: layout(~{::title}, ~{::section})">
+
+<head>
+    <title>VA Dashboard</title>
+</head>
+
+<body>
+<section>
+
+    <h1>VA Benefits Eligibility &amp; Tracking System</h1>
+
+    <!-- Welcome section -->
+    <div class="card">
+        <h2>
+            Welcome,
+            <span th:text="${veteran != null ? veteran.firstName : 'User'}">User</span>!
+        </h2>
+
+        <p>
+            Use this dashboard to review your profile, track claims,
+            and explore information about benefits and resources available to veterans.
+        </p>
+    </div>
+
+    <!-- Eligibility summary -->
+    <div class="card">
+        <h2>Eligibility Summary</h2>
+
+        <p>
+            <strong>Status:</strong><br>
+            <span th:text="${eligibilityStatus}">Not Evaluated</span>
+        </p>
+
+        <p>
+            <strong>Reason:</strong><br>
+            <span th:text="${eligibilityReason}">Eligibility information is unavailable.</span>
+        </p>
+
+        <p>
+            <small>
+                This is a simplified educational eligibility simulation.
+                It is not an official VA eligibility determination.
+                Actual benefit requirements vary by program and individual circumstances.
+            </small>
+        </p>
+    </div>
+
+    <!-- Benefits and resources -->
+    <div class="card">
+        <h2>Benefits &amp; Resources</h2>
+
+        <p>
+            Explore information about benefits, services, and support
+            programs that may be available to veterans.
+        </p>
+
+        <p>
+            Learn about health care, education, disability compensation,
+            housing assistance, employment, and other veteran resources.
+        </p>
+
+        <a th:href="@{/benefits}">Explore Benefits &amp; Resources</a>
+    </div>
+	
+	<!-- Goals and Action Planner -->
+	<div class="card">
+
+	    <h2>Goals &amp; Action Planner</h2>
+
+	    <p>
+	        Set personal goals related to your veteran benefits
+	        and organize the steps you want to take toward achieving them.
+	    </p>
+
+	    <p>
+	        Create action-plan tasks, maintain preparation checklists,
+	        set target dates, and track your progress.
+	    </p>
+
+	    <p>
+	        <a th:href="@{/goals}">View My Goals</a>
+	    </p>
+
+	    <p>
+	        <a th:href="@{/planner}">Open Action Planner</a>
+	    </p>
+
+	    <p>
+	        <a th:href="@{/planner/new}">Create a Task</a>
+	    </p>
+
+	</div>
+
+    <!-- Quick actions -->
+    <div class="card">
+        <h2>Quick Actions</h2>
+
+        <ul>
+            <li>
+                <a th:href="@{/my-profile}">My Profile</a>
+            </li>
+
+            <li th:if="${user.role.name() != 'ROLE_ADMIN'}">
+                <a th:href="@{/claims/my}">My Claims</a>
+            </li>
+
+            <li th:if="${user.role.name() == 'ROLE_ADMIN'}">
+                <a th:href="@{/admin}">Admin Dashboard</a>
+            </li>
+        </ul>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+
+</section>
+</body>
+</html>
+

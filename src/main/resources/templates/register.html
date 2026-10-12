@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts :: layout(~{::title}, ~{::content})">
+
+<head>
+    <title>Create Account</title>
+</head>
+
+<body>
+<div th:fragment="content">
+
+    <h1>Create Veteran Account</h1>
+
+    <div class="card">
+
+        <!-- General registration error -->
+        <div th:if="${registrationError}"
+             class="error-message"
+             th:text="${registrationError}">
+        </div>
+
+        <!-- Field validation summary -->
+        <div th:if="${#fields.hasErrors('form')}"
+             class="error-message">
+            Please correct the registration information and try again.
+        </div>
+
+        <form th:action="@{/register}" th:object="${form}" method="post">
+
+            <h2>Login Information</h2>
+
+            Username:
+            <input type="text" th:field="*{username}">
+            <span class="error-message"
+                  th:errors="*{username}"></span>
+            <br><br>
+
+            Password:
+            <input type="password" th:field="*{password}">
+            <span class="error-message"
+                  th:errors="*{password}"></span>
+            <br><br>
+
+            Confirm Password:
+            <input type="password" th:field="*{confirmPassword}">
+            <span class="error-message"
+                  th:errors="*{confirmPassword}"></span>
+            <br><br>
+
+            <h2>Veteran Information</h2>
+
+            First Name:
+            <input type="text" th:field="*{firstName}">
+            <span class="error-message"
+                  th:errors="*{firstName}"></span>
+            <br><br>
+
+            Last Name:
+            <input type="text" th:field="*{lastName}">
+            <span class="error-message"
+                  th:errors="*{lastName}"></span>
+            <br><br>
+
+            Email:
+            <input type="email" th:field="*{email}">
+            <span class="error-message"
+                  th:errors="*{email}"></span>
+            <br><br>
+
+            Date of Birth:
+            <input type="date" th:field="*{dateOfBirth}">
+            <span class="error-message"
+                  th:errors="*{dateOfBirth}"></span>
+            <br><br>
+
+            Branch of Service:
+            <input type="text" th:field="*{branchOfService}">
+            <span class="error-message"
+                  th:errors="*{branchOfService}"></span>
+            <br><br>
+
+            Service Start Date:
+            <input type="date" th:field="*{serviceStartDate}">
+            <span class="error-message"
+                  th:errors="*{serviceStartDate}"></span>
+            <br><br>
+
+            Service End Date:
+            <input type="date" th:field="*{serviceEndDate}">
+            <span class="error-message"
+                  th:errors="*{serviceEndDate}"></span>
+            <br><br>
+
+            Discharge Status:
+            <input type="text" th:field="*{dischargeStatus}">
+            <span class="error-message"
+                  th:errors="*{dischargeStatus}"></span>
+            <br><br>
+
+            <button class="button" type="submit">Create Account</button>
+
+        </form>
+
+    </div>
+
+</div>
+</body>
+</html>
+
