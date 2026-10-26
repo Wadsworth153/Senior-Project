@@ -1,42 +1,130 @@
 <!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="layouts :: layout(~{::title}, ~{::content})">
 
 <head>
-    <title>Claims</title>
+    <title>My Benefits</title>
 </head>
 
 <body>
 
 <div th:fragment="content">
 
-<h1>Claims</h1>
+```
+<h1>My Benefits</h1>
+
+<p>
+    Track your VA benefits, review progress updates, and manage
+    upcoming follow-up actions in one place.
+</p>
 
 <div class="card">
 
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Type</th>
-        <th>Status</th>
-        <th>Date</th>
-        <th>Description</th>
-    </tr>
+    <table>
 
-    <tr th:each="claim : ${claims}">
-        <td th:text="${claim.id}"></td>
-        <td th:text="${claim.claimType}"></td>
-        <td th:text="${claim.status}"></td>
-        <td th:text="${claim.submittedDate}"></td>
-        <td th:text="${claim.description}"></td>
-    </tr>
-</table>
+        <thead>
+            <tr>
+                <th>Benefit Name</th>
+                <th>Category</th>
+                <th>Current Status</th>
+                <th>Date Created</th>
+                <th>Last Updated</th>
+                <th>Next Follow-Up</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr th:each="claim : ${claims}">
+
+                <td th:text="${claim.claimType}">
+                    Benefit Name
+                </td>
+
+                <td>
+                    <span th:if="${claim.benefitType != null}"
+                          th:text="${#strings.replace(claim.benefitType.name(), '_', ' ')}">
+                        Benefit Category
+                    </span>
+
+                    <span th:if="${claim.benefitType == null}">
+                        Not specified
+                    </span>
+                </td>
+
+                <td>
+                    <span th:if="${claim.benefitStatus != null}"
+                          th:text="${#strings.replace(claim.benefitStatus.name(), '_', ' ')}">
+                        Current Status
+                    </span>
+
+                    <span th:if="${claim.benefitStatus == null}"
+                          th:text="${claim.status}">
+                        Legacy Status
+                    </span>
+                </td>
+
+                <td th:text="${claim.submittedDate != null
+                              ? claim.submittedDate : 'Not specified'}">
+                    Date Created
+                </td>
+
+                <td>
+                    <span th:if="${claim.updates != null
+                                 and !claim.updates.isEmpty()}"
+                          th:text="${claim.updates.get(0).updateDate}">
+                        Last Updated
+                    </span>
+
+                    <span th:if="${claim.updates == null
+                                 or claim.updates.isEmpty()}">
+                        No updates
+                    </span>
+                </td>
+
+                <td>
+                    <span th:if="${claim.updates != null
+                                 and !claim.updates.isEmpty()
+                                 and claim.updates.get(0).followUpDate != null}"
+                          th:text="${claim.updates.get(0).followUpDate}">
+                        Follow-Up Date
+                    </span>
+
+                    <span th:if="${claim.updates == null
+                                 or claim.updates.isEmpty()
+                                 or claim.updates.get(0).followUpDate == null}">
+                        Not scheduled
+                    </span>
+                </td>
+
+                <td>
+                    <a th:href="@{/claims/details(id=${claim.id})}">
+                        View Details
+                    </a>
+                </td>
+
+            </tr>
+
+            <tr th:if="${claims == null or claims.isEmpty()}">
+                <td colspan="7">
+                    No benefit trackers have been created yet.
+                </td>
+            </tr>
+
+        </tbody>
+
+    </table>
 
 </div>
 
 <br>
 
-<a class="button" th:href="@{/claims/new}">Create New Claim</a>
+<a class="button" th:href="@{/claims/new}">
+    Create Benefit Tracker
+</a>
+```
 
 </div>
 

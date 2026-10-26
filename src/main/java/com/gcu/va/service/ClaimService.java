@@ -1,102 +1,140 @@
+
 package com.gcu.va.service;
 
-// Import the Claim entity representing a veteran's benefit claim.
+import com.gcu.va.entity.BenefitStatus;
+import com.gcu.va.entity.BenefitType;
 import com.gcu.va.entity.Claim;
-
-// Import the repository responsible for accessing claim records in the database.
+import com.gcu.va.entity.ClaimStatus;
+import com.gcu.va.entity.ClaimUpdate;
 import com.gcu.va.repository.ClaimRepository;
+import com.gcu.va.repository.ClaimUpdateRepository;
 
-// Import Spring's Service annotation to register this class as a service bean.
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-// Import List to represent collections of claim records.
+import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Provides business logic for retrieving and saving veteran claim records.
- *
- * This service communicates with ClaimRepository to perform claim-related
- * data operations. Controllers can use this service without directly
- * accessing the repository.
- */
 @Service
 public class ClaimService {
 
-    // Repository used to retrieve and persist claim records.
     private final ClaimRepository claimRepository;
+    private final ClaimUpdateRepository claimUpdateRepository;
 
-    /**
-     * Creates the claim service with its required repository dependency.
-     *
-     * Constructor-based dependency injection allows Spring to supply the
-     * repository when creating this service.
-     *
-     * @param claimRepository repository used to access claim records
-     */
-    public ClaimService(ClaimRepository claimRepository) {
-
-        // Store the injected repository for use by the service methods.
+    public ClaimService(
+            ClaimRepository claimRepository,
+            ClaimUpdateRepository claimUpdateRepository) {
         this.claimRepository = claimRepository;
+        this.claimUpdateRepository = claimUpdateRepository;
     }
 
-    /**
-     * Retrieves all claims associated with a specific veteran.
-     *
-     * @param veteranId unique identifier of the veteran
-     * @return list of claims associated with the specified veteran
-     */
     public List<Claim> getClaimsForVeteran(Long veteranId) {
-
-        // Query the repository for claims belonging to the specified veteran.
         return claimRepository.findByVeteranId(veteranId);
     }
 
-    /**
-     * Retrieves all claim records and removes any null entries.
-     *
-     * @return list containing all non-null claim records
-     */
     public List<Claim> getAllClaims() {
-
-        // Retrieve all claims, create a stream, filter out null entries,
-        // and collect the remaining claims into a list.
         return claimRepository.findAll()
                 .stream()
-                .filter(c -> c != null)
+                .filter(claim -> claim != null)
                 .toList();
     }
 
-    /**
-     * Saves a claim record to the database.
-     *
-     * The repository determines whether the claim is inserted as a new
-     * record or updated as an existing record.
-     *
-     * @param claim claim record to save
-     * @return the saved claim returned by the repository
-     */
     public Claim saveClaim(Claim claim) {
-
-        // Delegate the persistence operation to the claim repository.
         return claimRepository.save(claim);
     }
 
-    /**
-     * Retrieves a claim using its unique identifier.
-     *
-     * If no claim exists with the supplied identifier, the method throws
-     * a RuntimeException containing the requested identifier.
-     *
-     * @param id unique identifier of the claim
-     * @return the matching claim record
-     * @throws RuntimeException if no claim exists with the supplied ID
-     */
+    
     public Claim getById(Long id) {
-
-        // Search for the claim by ID. If the repository returns an empty
-        // Optional, throw an exception to indicate that the claim was not found.
         return claimRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(
-                        "Claim not found with id: " + id));
+                .orElseThrow(() ->
+                        new RuntimeException("Claim not found with id: " + id));
+    }
+  
+
+
+    @Transactional
+    public Claim createBenefitTracker(
+            Claim claim,
+            BenefitType benefitType,
+            BenefitStatus benefitStatus,
+            String notes,
+            LocalDate followUpDate) {
+
+        claim.setBenefitType(benefitType);
+        claim.setBenefitStatus(benefitStatus);
+        claim.setStatus(mapToClaimStatus(benefitStatus));
+
+        if (claim.getSubmittedDate() == null) {
+            claim.setSubmittedDate(LocalDate.now());
+        }
+
+        Claim savedClaim = claimRepository.save(claim);
+
+        ClaimUpdate initialUpdate = new ClaimUpdate();
+        initialUpdate.setStatus(savedClaim.getStatus());
+        initialUpdate.setBenefitStatus(benefitStatus);
+        initialUpdate.setUpdateDate(LocalDate.now());
+        initialUpdate.setNotes(notes);
+        initialUpdate.setFollowUpDate(followUpDate);
+        initialUpdate.setClaim(savedClaim);
+
+        claimUpdateRepository.save(initialUpdate);
+
+        return savedClaim;
+    }
+
+    @Transactional
+    public ClaimUpdate addBenefitUpdate(
+            Long claimId,
+            BenefitStatus newStatus,
+            LocalDate updateDate,
+            String notes,
+            LocalDate followUpDate) {
+
+        Claim claim = claimRepository.findById(claimId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Benefit tracker not found: " + claimId));
+
+        claim.setBenefitStatus(newStatus);
+        claim.setStatus(mapToClaimStatus(newStatus));
+
+        ClaimUpdate update = new ClaimUpdate();
+        update.setStatus(claim.getStatus());
+        update.setBenefitStatus(newStatus);
+        update.setUpdateDate(
+                updateDate != null ? updateDate : LocalDate.now());
+        update.setNotes(notes);
+        update.setFollowUpDate(followUpDate);
+        update.setClaim(claim);
+
+        claimRepository.save(claim);
+
+        return claimUpdateRepository.save(update);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClaimUpdate> getBenefitUpdates(Long claimId) {
+        return claimUpdateRepository
+                .findByClaimIdOrderByUpdateDateDesc(claimId);
+    }
+
+    private ClaimStatus mapToClaimStatus(BenefitStatus benefitStatus) {
+        if (benefitStatus == null) {
+            return ClaimStatus.UNDER_REVIEW;
+        }
+
+        switch (benefitStatus) {
+            case APPROVED:
+            case COMPLETE:
+                return ClaimStatus.APPROVED;
+
+            case DENIED:
+                return ClaimStatus.DENIED;
+
+            default:
+                return ClaimStatus.UNDER_REVIEW;
+        }
     }
 }
+

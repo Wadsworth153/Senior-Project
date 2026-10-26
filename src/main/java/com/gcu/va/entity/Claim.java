@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 // Import LocalDate to store the claim submission date without a time component.
 import java.time.LocalDate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Represents a claim submitted by a veteran.
  *
@@ -39,6 +42,59 @@ public class Claim {
     @ManyToOne
     @JoinColumn(name = "veteran_id")
     private Veteran veteran;
+    
+    /**
+     * Historical progress updates associated with this claim.
+     *
+     * The claim owns the lifecycle of its history entries.
+     */
+    @OneToMany(
+        mappedBy = "claim",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    @OrderBy("updateDate DESC, createdAt DESC")
+    private List<ClaimUpdate> updates = new ArrayList<>();
+
+    public List<ClaimUpdate> getUpdates() {
+        return updates;
+    }
+
+    public void setUpdates(List<ClaimUpdate> updates) {
+        this.updates = updates;
+    }
+
+    /**
+     * Associates an update with this claim and maintains
+     * the relationship on both sides.
+     *
+     * @param update history entry to associate
+     */
+    public void addUpdate(ClaimUpdate update) {
+        if (update != null) {
+            update.setClaim(this);
+            updates.add(update);
+        }
+    }
+
+    /**
+     * Removes an update from this claim.
+     *
+     * @param update history entry to remove
+     */
+    public void removeUpdate(ClaimUpdate update) {
+        if (update != null && updates.remove(update)) {
+            update.setClaim(null);
+        }
+    }
+    
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
+    private BenefitType benefitType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
+    private BenefitStatus benefitStatus;
 
     // Getters and Setters
 
@@ -160,5 +216,21 @@ public class Claim {
     public void setVeteran(Veteran veteran) {
         // Assign the associated veteran.
         this.veteran = veteran;
+    }
+    
+    public BenefitType getBenefitType() {
+        return benefitType;
+    }
+
+    public void setBenefitType(BenefitType benefitType) {
+        this.benefitType = benefitType;
+    }
+
+    public BenefitStatus getBenefitStatus() {
+        return benefitStatus;
+    }
+
+    public void setBenefitStatus(BenefitStatus benefitStatus) {
+        this.benefitStatus = benefitStatus;
     }
 }

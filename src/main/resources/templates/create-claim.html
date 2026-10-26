@@ -1,40 +1,121 @@
 <!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layouts :: layout(~{::title}, ~{::section})">
+      th:replace="layouts :: layout(~{::title}, ~{::content})">
 
 <head>
-    <title>Create Claim</title>
+    <title>Create Benefit Tracker</title>
 </head>
 
 <body>
 
-<section>
+<div th:fragment="content">
 
-<h1>Submit New Claim</h1>
+```
+<h1>Create Benefit Tracker</h1>
 
 <div class="card">
 
-<form th:action="@{/claims/new}" th:object="${claim}" method="post">
+    <form th:action="@{/claims/new}" method="post">
 
-    <label>Claim Type:</label><br>
-    <input type="text" th:field="*{claimType}" />
-    <br><br>
+        <div>
+            <label for="claimType">Benefit Name</label>
+            <input type="text"
+                   id="claimType"
+                   name="claimType"
+                   maxlength="100"
+                   placeholder="e.g., Disability Compensation"
+                   required>
+        </div>
 
-    <label>Description:</label><br>
-    <textarea th:field="*{description}"></textarea>
-    <br><br>
+        <br>
 
-    <button class="button" type="submit">Submit Claim</button>
+        <div>
+            <label for="benefitType">Benefit Category</label>
 
-</form>
+            <select id="benefitType"
+                    name="benefitType"
+                    required>
 
-<br>
+                <option value="">Select a benefit category</option>
 
-<a class="button" th:href="@{/claims}">Back to Claims</a>
+                <option th:each="type : ${benefitTypes}"
+                        th:value="${type.name()}"
+                        th:text="${#strings.replace(type.name(), '_', ' ')}">
+                </option>
+
+            </select>
+        </div>
+
+        <br>
+
+        <div>
+            <label for="benefitStatus">Initial Status</label>
+
+            <select id="benefitStatus"
+                    name="benefitStatus"
+                    required>
+
+                <option value="">Select an initial status</option>
+
+                <option th:each="status : ${benefitStatuses}"
+                        th:value="${status.name()}"
+                        th:text="${#strings.replace(status.name(), '_', ' ')}">
+                </option>
+
+            </select>
+        </div>
+
+        <br>
+
+        <div>
+            <label for="description">Description</label>
+
+            <textarea id="description"
+                      name="description"
+                      rows="4"
+                      maxlength="2000"
+                      placeholder="Describe the benefit you are tracking."></textarea>
+        </div>
+
+        <br>
+
+        <div>
+            <label for="notes">Initial Notes</label>
+
+            <textarea id="notes"
+                      name="notes"
+                      rows="4"
+                      maxlength="2000"
+                      placeholder="Record any initial information or actions already taken."></textarea>
+        </div>
+
+        <br>
+
+        <div>
+            <label for="followUpDate">Next Follow-Up Date</label>
+
+            <input type="date"
+                   id="followUpDate"
+                   name="followUpDate">
+        </div>
+
+        <br>
+
+        <button type="submit" class="button">
+            Create Benefit Tracker
+        </button>
+
+        <a class="button" th:href="@{/claims}">
+            Cancel
+        </a>
+
+    </form>
 
 </div>
+```
 
-</section>
+</div>
 
 </body>
 </html>

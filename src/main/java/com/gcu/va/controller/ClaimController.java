@@ -27,6 +27,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.time.LocalDate;
+
+import com.gcu.va.entity.BenefitStatus;
+import com.gcu.va.entity.BenefitType;
+import com.gcu.va.entity.ClaimUpdate;
+
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Handles web requests related to veteran claims.
@@ -107,6 +114,8 @@ public class ClaimController {
                 "No veteran profile is associated with this account."
             );
         }
+        
+        
 
         // Render the claims page with the claims added to the model.
         return "claims";
@@ -140,6 +149,8 @@ public class ClaimController {
 
         // Provide an empty Claim object for the form to bind its input fields.
         model.addAttribute("claim", new Claim());
+        model.addAttribute("benefitTypes", BenefitType.values());
+        model.addAttribute("benefitStatuses", BenefitStatus.values());
 
         // Render the claim creation form.
         return "create-claim";
@@ -162,41 +173,38 @@ public class ClaimController {
     public String createClaim(
             @RequestParam String claimType,
             @RequestParam(required = false) String description,
+            @RequestParam BenefitType benefitType,
+            @RequestParam BenefitStatus benefitStatus,
+            @RequestParam(required = false) String notes,
+            @RequestParam(required = false) String followUpDate,
             Authentication auth) {
 
-        // Retrieve the account associated with the authenticated username.
         User user = userRepository.findByUsername(auth.getName());
 
-        // Only veterans with an associated profile can submit claims.
-        if (user == null || user.getRole() != Role.ROLE_VETERAN
+        if (user == null
+                || user.getRole() != Role.ROLE_VETERAN
                 || user.getVeteran() == null) {
             throw new AccessDeniedException(
-                "Only veterans with a profile can submit claims."
-            );
+                    "Only veterans with a profile can create benefit trackers.");
         }
 
-        // Create a new claim entity to hold the submitted information.
         Claim claim = new Claim();
-
-        // Store the claim type provided by the user.
         claim.setClaimType(claimType);
-
-        // Store the optional claim description.
         claim.setDescription(description);
-
-        // Associate the claim with the authenticated veteran's profile.
         claim.setVeteran(user.getVeteran());
 
-        // Set the initial status for a newly submitted claim.
-        claim.setStatus(ClaimStatus.SUBMITTED);
+        LocalDate parsedFollowUpDate =
+                (followUpDate == null || followUpDate.isBlank())
+                        ? null
+                        : LocalDate.parse(followUpDate);
 
-        // Record the date on which the claim is submitted.
-        claim.setSubmittedDate(LocalDate.now());
+        claimService.createBenefitTracker(
+                claim,
+                benefitType,
+                benefitStatus,
+                notes,
+                parsedFollowUpDate);
 
-        // Save the new claim through the claim service.
-        claimService.saveClaim(claim);
-
-        // Redirect to the claims page after successfully saving the claim.
         return "redirect:/claims";
     }
 
@@ -250,5 +258,88 @@ public class ClaimController {
 
         // Return the administrator to the dashboard after the update.
         return "redirect:/admin";
+    }
+    
+    @GetMapping("/claims/details")
+    public String viewClaimDetails(
+            @RequestParam Long id,
+            Authentication auth,
+            Model model) {
+
+        User user = userRepository.findByUsername(auth.getName());
+
+        if (user == null) {
+            throw new AccessDeniedException("User account not found.");
+        }
+
+        Claim claim = claimService.getById(id);
+
+        boolean isAdmin = user.getRole() == Role.ROLE_ADMIN;
+
+        boolean isOwner = user.getRole() == Role.ROLE_VETERAN
+                && user.getVeteran() != null
+                && claim.getVeteran() != null
+                && claim.getVeteran().getId()
+                        .equals(user.getVeteran().getId());
+
+        if (!isAdmin && !isOwner) {
+            throw new AccessDeniedException(
+                    "You are not authorized to view this benefit tracker.");
+        }
+
+        model.addAttribute("claim", claim);
+        model.addAttribute(
+                "updates",
+                claimService.getBenefitUpdates(id));
+        model.addAttribute("benefitStatuses", BenefitStatus.values());
+
+        return "claim-details";
+    }
+    
+    @PostMapping("/claims/update-progress")
+    public String updateBenefitProgress(
+            @RequestParam Long id,
+            @RequestParam BenefitStatus benefitStatus,
+            @RequestParam(required = false) String updateDate,
+            @RequestParam(required = false) String notes,
+            @RequestParam(required = false) String followUpDate,
+            Authentication auth) {
+
+        User user = userRepository.findByUsername(auth.getName());
+
+        if (user == null
+                || user.getRole() != Role.ROLE_VETERAN
+                || user.getVeteran() == null) {
+            throw new AccessDeniedException(
+                    "Only veterans with a profile can update their trackers.");
+        }
+
+        Claim claim = claimService.getById(id);
+
+        if (claim.getVeteran() == null
+                || !claim.getVeteran().getId()
+                        .equals(user.getVeteran().getId())) {
+            throw new AccessDeniedException(
+                    "You are not authorized to update this tracker.");
+        }
+
+        LocalDate parsedUpdateDate =
+                (updateDate == null || updateDate.isBlank())
+                        ? LocalDate.now()
+                        : LocalDate.parse(updateDate);
+
+        LocalDate parsedFollowUpDate =
+                (followUpDate == null || followUpDate.isBlank())
+                        ? null
+                        : LocalDate.parse(followUpDate);
+
+        claimService.addBenefitUpdate(
+                id,
+                benefitStatus,
+                parsedUpdateDate,
+                notes,
+                parsedFollowUpDate);
+
+        return "redirect:/claims/details?id=" + id;
     }
 }
